@@ -1,0 +1,46 @@
+title: Intel Product Change Notification Archive
+
+description: >-
+  An indexable repository of Intel Product Change Notifications,
+  so they can be searched on the internet.
+url: "https://intel.pcn.captnemo.in"
+
+theme: minima
+plugins:
+  - jekyll-sitemap
+  - jekyll-datapage-generator
+baseurl: /
+exclude:
+  - README.md
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - _scripts
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+sass:
+  sass_dir: _scss
+  quiet_deps: true
+
+page_gen:
+
+- data: pcn
+  template: pcn
+  dir: pcn
+  index_files: true
+  name: id
+  title: title
+
+- data: pcn
+  template: json
+  dir: api
+  index_files: false
+  extension: json
+  name: id
+  title: id

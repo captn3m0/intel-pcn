@@ -1,0 +1,50 @@
+---
+layout: page
+sitemap: true
+---
+
+<p>{{page.abstract | replace: '¬',""}}</p>
+
+<table>
+	<tbody>
+		<tr>
+			<th>Publish Date</th>
+			<td>{{page.date | date_to_long_string}}</td>
+		</tr>
+		<tr>
+			<th>PCN Number</th>
+			<td><code>{{page.id}}</code></td>
+		</tr>
+		<tr>
+			<th>PCN Title</th>
+			<td>{{page.title|replace: '¬',''}}</td>
+		</tr>
+		<tr>
+			<th>Key Characteristics</th>
+			<td>{{page.key_characteristics}}</td>
+		</tr>
+		<tr>
+			<th>Product Categories</th>
+			<td>{{page.categories}}</td>
+		</tr>
+
+		<tr>
+			<th>Complete PCN PDF</th>
+			<td><a href="{{page.pdf_url}}">{{page.pdf_url}}</a></td>
+		</tr>
+		<tr>
+			<th>API URL</th>
+			<td>
+				<a href="/api/{{page.id}}.json">/api/{{page.id}}.json</a>
+			</td>
+		</tr>
+		<tr>
+			<th>Alternate PDF URL (redirect)</th>
+			<td>
+				<code>
+					<a href="/pcn/{{page.id}}/pdf">/pcn/{{page.id}}/pdf</a>
+				</code>
+			</td>
+		</tr>
+	</tbody>
+</table>

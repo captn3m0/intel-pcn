@@ -1,0 +1,16 @@
+---
+layout: home
+---
+
+{{content}}
+
+<script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js" integrity="sha256-JDYsFFqB4eL9lRhcQwDSWVr7LK3Z8VgMLdzpW8GbIIQ=" crossorigin="anonymous"></script>
+<script>
+	let table = new DataTable('.home table', {
+		"paging": false,
+		"autoWidth": false,
+		"info": false
+	});
+</script>
+<link rel=stylesheet type=text/css href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
