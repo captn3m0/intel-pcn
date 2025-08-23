@@ -1,7 +1,6 @@
 [build]
   command = """
-  pip install .
-  python _scripts/init.py
+  wget https://github.com/captn3m0/intel-pcn/releases/latest/download/pcn.db
   bundle exec jekyll build
   """
   publish = "_site/"
