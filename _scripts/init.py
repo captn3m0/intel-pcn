@@ -117,7 +117,7 @@ def fetch_pcns() -> List[Dict[str, Any]]:
         "accept-encoding": "gzip, deflate, br, zstd",
         "accept": "application/json",
         "content-type": "application/json",
-        "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJmaWx0ZXIiOiJOT1QgQHBhcnRuZXJ0YXJnZXQiLCJ1c2VyR3JvdXBzIjpbIlU6UHVibGljIiwiYW5vbnltb3VzIl0sInNlYXJjaEh1YiI6InJkYy10ZWNobmljYWxsaWJyYXJ5IiwidjgiOnRydWUsInRva2VuSWQiOiJ4ZDZhdGpsaWFucHZmZGtwZXBqaHF2MmlsYSIsIm9yZ2FuaXphdGlvbiI6ImludGVsY29ycG9yYXRpb25wcm9kdWN0aW9uZTc4bjI1czYiLCJ1c2VySWRzIjpbeyJ0eXBlIjoiVXNlciIsIm5hbWUiOiJhbm9ueW1vdXMiLCJwcm92aWRlciI6IkVtYWlsIFNlY3VyaXR5IFByb3ZpZGVyIn1dLCJyb2xlcyI6WyJxdWVyeUV4ZWN1dG9yIl0sImlzcyI6IlNlYXJjaEFwaSIsImV4cCI6MTc1NjAyNjg5OSwiaWF0IjoxNzU1OTQwNDk5fQ.nu6SBZj3b9wFok-7dH5nc4MTFFqNmNIpNj7AED4jNUg"
+        "authorization": f"Bearer {os.environ.get('COVEO_API_KEY', 'INTEL_API_BEARER_TOKEN')}",
     }
     
     all_pcns = []
