@@ -2,7 +2,7 @@
 
 This website archives and collects Intel Product Change Notifications.
 
-## TODO
+- [x] Automate daily commits using GitHub Actions
+- [x] SQLite exports
 
-- [ ] Automate daily commits using GitHub Actions
-- [ ] SQLite exports
+There is a JSONFeed, an RSS Feed, and an API.
