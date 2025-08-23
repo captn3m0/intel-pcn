@@ -3,47 +3,45 @@ layout: page
 sitemap: true
 ---
 
-<p>{{page.abstract | replace: '¬',""}}</p>
+<p>{{page.description }}</p>
 
 <table>
 	<tbody>
 		<tr>
 			<th>Publish Date</th>
-			<td>{{page.date | date_to_long_string}}</td>
+			<td>{{page.createddate|divided_by: 1000 | date_to_long_string}}</td>
 		</tr>
 		<tr>
 			<th>PCN Number</th>
-			<td><code>{{page.id}}</code></td>
+			<td><code>{{page.contentid}}</code></td>
 		</tr>
 		<tr>
 			<th>PCN Title</th>
-			<td>{{page.title|replace: '¬',''}}</td>
+			<td>{{page.title}}</td>
 		</tr>
 		<tr>
-			<th>Key Characteristics</th>
-			<td>{{page.key_characteristics}}</td>
+			<th>Description</th>
+			<td>{{page.description}}</td>
 		</tr>
 		<tr>
-			<th>Product Categories</th>
-			<td>{{page.categories}}</td>
+			<th>Upstream PDF</th>
+			<td><a href="{{page.sysuri}}">PCN-{{page.contentid}}.pdf</a></td>
 		</tr>
 
 		<tr>
-			<th>Complete PCN PDF</th>
-			<td><a href="{{page.pdf_url}}">{{page.pdf_url}}</a></td>
+			<th>Intel Website URL</th>
+			<td><a href="https://intel.com{{page.secondaryurl}}">PCN {{page.contentid}} on Intel.com</a></td>
 		</tr>
+
+		<tr>
+			<th>Type</th>
+			<td>{{page.downloadtype}}</td>
+		</tr>
+
 		<tr>
 			<th>API URL</th>
 			<td>
-				<a href="/api/{{page.id}}.json">/api/{{page.id}}.json</a>
-			</td>
-		</tr>
-		<tr>
-			<th>Alternate PDF URL (redirect)</th>
-			<td>
-				<code>
-					<a href="/pcn/{{page.id}}/pdf">/pcn/{{page.id}}/pdf</a>
-				</code>
+				<a href="/api/{{page.contentid}}.json">/api/{{page.contentid}}.json</a>
 			</td>
 		</tr>
 	</tbody>

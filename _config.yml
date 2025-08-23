@@ -7,6 +7,7 @@ url: "https://intel.pcn.captnemo.in"
 
 theme: minima
 plugins:
+  - jekyll_sqlite
   - jekyll-sitemap
   - jekyll-datapage-generator
 baseurl: /
@@ -14,6 +15,7 @@ exclude:
   - README.md
   - .sass-cache/
   - .jekyll-cache/
+  - .venv
   - gemfiles/
   - _scripts
   - Gemfile
@@ -23,24 +25,29 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-
+include:
+  - _redirects
 sass:
   sass_dir: _scss
   quiet_deps: true
 
+sqlite:
+- file: pcn.db
+  query: SELECT * FROM pcns
+  data: pcn
 page_gen:
 
 - data: pcn
   template: pcn
   dir: pcn
   index_files: true
-  name: id
-  title: title
+  name: contentid
+  title: systitle
 
 - data: pcn
   template: json
   dir: api
   index_files: false
   extension: json
-  name: id
-  title: id
+  name: contentid
+  title: systitle

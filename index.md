@@ -6,7 +6,8 @@ permalink: /
 This website archives and collects Intel Product Change Notifications.
 
 - An RSS Feed is available at [/feed.xml](/feed.xml).
-- A complete CSV export is [published on GitHub](https://github.com/captn3m0/intel-pcn/blob/main/_data/pcn.csv). You can also check it at <https://flatgithub.com/captn3m0/intel-pcn> as well.
+- A SQLite export is [published on GitHub](https://github.com/captn3m0/intel-pcn/releases/latest)
+- There is an API available that returns each PCN individually.
 
 <table>
 	<thead>
@@ -17,12 +18,12 @@ This website archives and collects Intel Product Change Notifications.
 		</tr>
 	</thead>
 	<tbody>
-		{% assign pcns = site.data.pcn | sort:"date" | reverse %}
+		{% assign pcns = site.data.pcn | sort:"createddate" | reverse %}
 		{% for pcn in pcns %}
 		<tr>
-			<td><code>{{ pcn.id }}</code></td>
-			<td><a href="/pcn/{{ pcn.id }}/">{{ pcn.title |replace: '¬',' '}}</a></td>
-			<td>{{ pcn.date | date_to_long_string }}</td>
+			<td><code>{{ pcn.contentid }}</code></td>
+			<td><a href="/pcn/{{ pcn.contentid }}/">{{ pcn.systitle | title}}</a></td>
+			<td data-order={{pcn.createddate}}>{{ pcn.createddate | divided_by:1000 | date_to_long_string }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>

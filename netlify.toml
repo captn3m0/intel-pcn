@@ -1,13 +1,10 @@
 [build]
-  command = "bundle exec jekyll build"
-  publish = "_site/"
-
-[context.deploy-preview]
   command = """
-  # Replace the Deploy URL with the Preview URL
-  sed -i "/url\:/curl\: $DEPLOY_PRIME_URL" _config.yml
+  pip install .
+  python _scripts/init.py
   bundle exec jekyll build
   """
+  publish = "_site/"
 
 [[plugins]]
 package = "netlify-plugin-submit-sitemap"

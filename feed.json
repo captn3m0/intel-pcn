@@ -1,0 +1,29 @@
+---
+---
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "{{site.title}}",
+  "home_page_url": "{{ site.url }}{{site.baseurl}}",
+  "feed_url": "{{ site.url }}{{site.baseurl}}feed.json",
+  "description": "{{site.description}} All new PCNs are published on this feed daily.",
+  "items": [
+    {% assign D = site.data.pcn | sort:"createddate" | reverse %}
+    {% for pcn in D limit:100 %}
+    {
+      "id": "PCN-{{pcn.contentid}}",
+      "title": {{ pcn.systitle | jsonify }},
+      "date_published": "{{ pcn.createddate | divided_by: 1000 | date_to_xmlschema }}",
+      "url": "{{ site.url }}{{site.baseurl}}pcn/{{pcn.contentid}}/",
+      "external_url": "https://intel.com{{pcn.secondaryurl}}",
+      "attachments": [
+        {
+          "url": {{ pcn.sysuri | jsonify }},
+          "mime_type": "application/pdf",
+          "title": "PCN-{{pcn.contentid}}.pdf"
+        }
+      ],
+      "api_url": "{{ site.url }}{{site.baseurl}}/api/{{pcn.contentid}}.json"
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}

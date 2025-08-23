@@ -14,22 +14,27 @@
 		<link>{{ site.url }}{{site.baseurl}}</link>
 		<atom:link href="{{ site.url }}{{site.baseurl}}feed.xml" rel="self" type="application/rss+xml" />
 		<lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
-		{% assign D = site.data.pcn | sort:'date' | reverse %}
+		{% assign D = site.data.pcn | sort:"createddate" | reverse %}			
 		{% for pcn in D limit:10 %}
 			<item>
-				<title>{{ pcn.title | replace: '¬', '' | xml_escape }}</title>
+				<title>{{ pcn.systitle xml_escape }}</title>
 				<description>{%capture description%}
 
-					<strong>PCN ID: </strong> {{pcn.id}}
+					<strong>PCN ID: </strong> {{pcn.contentid}}
 					<br>
 					{{pcn.abstract}}
 					<br>
-					Complete PCN PDF is available at <a href="{{ site.url }}{{site.baseurl}}/pcn/{{pcn.id}}/pdf">/pcn/{{pcn.id}}/pdf</a>.
+					Complete PCN PDF is available at <a href="{{ pcn.sysuri}}">{{ pcn.sysuri}}</a>.
+					<strong>Description: </strong>{{pcn.description}}<br>
+					<strong>Type: </strong>{{pcn.downloadtype}}<br>
+					<strong>Intel HTML: </strong><a href="https://www.intel.com{{pcn.secondaryurl}}">Intel Website</a><br>
+
+
 					{%endcapture%}
 
 					{{ description | xml_escape }}</description>
-				<pubDate>{{ pcn.date | date_to_rfc822 }}</pubDate>
-				<link>{{ site.url }}{{site.baseurl}}/pcn/{{pcn.id}}/</link>
+				<pubDate>{{ pcn.createddate|divided_by:1000 | date_to_rfc822 }}</pubDate>
+				<link>{{ site.url }}{{site.baseurl}}pcn/{{pcn.contentid}}/</link>
 				<guid>PCN-{{pcn.id}}</guid>
 			</item>
 		{% endfor %}
