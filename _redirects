@@ -10,5 +10,5 @@
 layout: null
 ---
 {% for pcn in site.data.pcn %}
-/pcn/{{pcn.contentid}/pdf {{pcn.sysuri}}
+/pcn/{{pcn.contentid}}/pdf {{pcn.sysuri}}
 {% endfor %}

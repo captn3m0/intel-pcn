@@ -17,7 +17,7 @@
 		{% assign D = site.data.pcn | sort:"createddate" | reverse %}			
 		{% for pcn in D limit:10 %}
 			<item>
-				<title>{{ pcn.systitle xml_escape }}</title>
+				<title>{{ pcn.systitle |  xml_escape }}</title>
 				<description>{%capture description%}
 
 					<strong>PCN ID: </strong> {{pcn.contentid}}
