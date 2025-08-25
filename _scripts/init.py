@@ -7,6 +7,7 @@ Fetches PCNs from Intel's search API and stores them in SQLite database.
 import sqlite3
 import requests
 import json
+import os
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -109,7 +110,7 @@ def insert_pcn(conn: sqlite3.Connection, raw_pcn: Dict[str, Any]) -> None:
     ))
 
 
-def fetch_pcns() -> List[Dict[str, Any]]:
+def fetch_pcns(token: str) -> List[Dict[str, Any]]:
     """Fetch all PCNs from Intel's API using pagination."""
     url = "https://intelcorporationproductione78n25s6.org.coveo.com/rest/search"
     
@@ -117,7 +118,7 @@ def fetch_pcns() -> List[Dict[str, Any]]:
         "accept-encoding": "gzip, deflate, br, zstd",
         "accept": "application/json",
         "content-type": "application/json",
-        "authorization": f"Bearer {os.environ.get('COVEO_API_KEY', 'INTEL_API_BEARER_TOKEN')}",
+        "authorization": f"Bearer {token}",
     }
     
     all_pcns = []
@@ -174,6 +175,11 @@ def fetch_pcns() -> List[Dict[str, Any]]:
     
     return all_pcns
 
+def get_token()-> str: 
+    url = "https://www.intel.com/libs/intel/services/replatform?searchHub=rdc-technicallibrary"
+    response = requests.get(url).json()
+    print(response)
+    return response['token']
 
 def main():
     """Main function to fetch PCNs and populate database."""
@@ -185,10 +191,13 @@ def main():
     try:
         # Fetch all PCNs
         print("Fetching PCNs from Intel API...")
-        pcns = fetch_pcns()
+        auth_token = get_token()
+        pcns = fetch_pcns(token)
         
         if not pcns:
             print("No PCNs fetched. Exiting.")
+            import sys
+            sys.exit(1)
             return
         
         # Insert PCNs into database
