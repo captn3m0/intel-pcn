@@ -6,3 +6,5 @@ vendor
 .venv
 pcn.db
 .env
+# We use pip compile instead
+uv.lock

@@ -8,6 +8,7 @@ import sqlite3
 import requests
 import json
 import os
+import curl_cffi
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -176,10 +177,10 @@ def fetch_pcns(token: str) -> List[Dict[str, Any]]:
     return all_pcns
 
 def get_token()-> str: 
-    url = "https://www.intel.com/libs/intel/services/replatform?searchHub=rdc-technicallibrary"
-    response = requests.get(url).json()
-    print(response)
-    return response['token']
+    BROWSER_CODE = "safari18_4_ios"
+    TOKEN_URL = "https://www.intel.com/libs/intel/services/replatform?searchHub=rdc-technicallibrary"
+    body = curl_cffi.get(TOKEN_URL, impersonate=BROWSER_CODE).json()
+    return body['token']
 
 def main():
     """Main function to fetch PCNs and populate database."""
@@ -192,7 +193,7 @@ def main():
         # Fetch all PCNs
         print("Fetching PCNs from Intel API...")
         auth_token = get_token()
-        pcns = fetch_pcns(token)
+        pcns = fetch_pcns(auth_token)
         
         if not pcns:
             print("No PCNs fetched. Exiting.")
@@ -216,9 +217,7 @@ def main():
         count = cursor.fetchone()[0]
         print(f"Successfully inserted {count} PCNs into pcn.db")
         
-    except Exception as e:
-        print(f"Error: {e}")
-        conn.rollback()
+    
     finally:
         conn.close()
 
