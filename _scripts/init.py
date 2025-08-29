@@ -9,10 +9,14 @@ import requests
 import json
 import os
 import curl_cffi
+import datetime
 from pathlib import Path
 from typing import Dict, Any, List
 
 
+# https://www.intel.com/content/www/us/en/content-details/677724/max-5000-product-change-notification.html
+# Oldest PCN from Intel that is available on the current site
+START_YEAR = 1994
 def create_database() -> sqlite3.Connection:
     """Create and initialize the PCN database."""
     db_path = Path("pcn.db")
@@ -21,7 +25,7 @@ def create_database() -> sqlite3.Connection:
     # Create the PCN table with all the fields from the sample
     conn.execute("""
         CREATE TABLE IF NOT EXISTS pcns (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contentid INTEGER PRIMARY KEY,
             systitle TEXT,
             sysurihash TEXT,
             createddate INTEGER,
@@ -30,7 +34,6 @@ def create_database() -> sqlite3.Connection:
             lastmodifieddt INTEGER,
             sysuri TEXT,
             docexpiredate INTEGER,
-            contentid INTEGER,
             description TEXT,
             permanentid TEXT,
             metadataclassification TEXT,
@@ -48,8 +51,7 @@ def create_database() -> sqlite3.Connection:
             sysfiletype TEXT,
             secondaryurl TEXT,
             uri TEXT,
-            issoftware TEXT,
-            UNIQUE(docuniqueid, version) ON CONFLICT REPLACE
+            issoftware TEXT
         )
     """)
     
@@ -111,7 +113,7 @@ def insert_pcn(conn: sqlite3.Connection, raw_pcn: Dict[str, Any]) -> None:
     ))
 
 
-def fetch_pcns(token: str) -> List[Dict[str, Any]]:
+def fetch_pcns(token: str, year: str) -> List[Dict[str, Any]]:
     """Fetch all PCNs from Intel's API using pagination."""
     url = "https://intelcorporationproductione78n25s6.org.coveo.com/rest/search"
     
@@ -125,10 +127,13 @@ def fetch_pcns(token: str) -> List[Dict[str, Any]]:
     all_pcns = []
     first_result = 0
     results_per_page = 100
+
+    startdate = f"{year}/01/01"
+    enddate   = f"{year}/12/31"
     
     while True:
         payload = {
-            "aq": "(@localecode==en_US) (@synapticaguid==(\"etm-b6e7ce4fd9e144048c526ca9c64587d8\",\"etm-fb506128738d478fbd7c7c7992367c48\",\"etm-432664f7da684e6fb3347b2fc528a3c7\",\"etm-53e34c9049b54c69aec7931e09591a7d\"))",
+            "aq": f"(@localecode==en_US) (@synapticaguid==(\"etm-b6e7ce4fd9e144048c526ca9c64587d8\",\"etm-fb506128738d478fbd7c7c7992367c48\",\"etm-432664f7da684e6fb3347b2fc528a3c7\",\"etm-53e34c9049b54c69aec7931e09591a7d\")) (@lastmodifieddt>={startdate} AND @lastmodifieddt<={enddate})",
             "firstResult": first_result,
             "numberOfResults": results_per_page,
             "locale": "en",
@@ -140,8 +145,6 @@ def fetch_pcns(token: str) -> List[Dict[str, Any]]:
             "queryFunctions": []
         }
         
-        print(f"Fetching PCNs {first_result} to {first_result + results_per_page - 1}...")
-        
         try:
             response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()
@@ -150,7 +153,6 @@ def fetch_pcns(token: str) -> List[Dict[str, Any]]:
             results = data.get("results", [])
             
             if not results:
-                print("No more results found.")
                 break
             
             # Extract raw PCN data
@@ -158,11 +160,8 @@ def fetch_pcns(token: str) -> List[Dict[str, Any]]:
                 if "raw" in result:
                     all_pcns.append(result["raw"])
             
-            print(f"Fetched {len(results)} PCNs (total: {len(all_pcns)})")
-            
             # Check if we got fewer results than requested (indicates end of data)
             if len(results) < results_per_page:
-                print("Reached end of results.")
                 break
             
             first_result += results_per_page
@@ -188,26 +187,24 @@ def main():
     
     # Create database and connection
     conn = create_database()
+    auth_token = get_token()
     
     try:
-        # Fetch all PCNs
-        print("Fetching PCNs from Intel API...")
-        auth_token = get_token()
-        pcns = fetch_pcns(auth_token)
-        
-        if not pcns:
-            print("No PCNs fetched. Exiting.")
-            import sys
-            sys.exit(1)
-            return
-        
-        # Insert PCNs into database
-        print(f"Inserting {len(pcns)} PCNs into database...")
-        for i, pcn in enumerate(pcns, 1):
-            insert_pcn(conn, pcn)
-            if i % 50 == 0:
-                print(f"Inserted {i}/{len(pcns)} PCNs...")
-                conn.commit()
+        current_year = datetime.datetime.now().year
+        for year in range(START_YEAR, current_year+1):
+            pcns = fetch_pcns(auth_token, str(year))
+            
+            if not pcns:
+                print("No PCNs fetched. Exiting.")
+                import sys
+                sys.exit(1)
+                return
+            
+            print(f"YEAR={year} | {len(pcns)} PCNs")
+            for i, pcn in enumerate(pcns, 1):
+                insert_pcn(conn, pcn)
+                if i % 50 == 0:
+                    conn.commit()
         
         # Final commit
         conn.commit()
