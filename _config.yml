@@ -30,8 +30,6 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-include:
-  - _redirects
 sass:
   sass_dir: _scss
   quiet_deps: true
