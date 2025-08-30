@@ -1,3 +1,14 @@
 ---
 ---
-{{page|jsonify}}
+{
+	"title": "{{page.title}}",
+	"id": "{{page.contentid}}",
+	"created_at": "{{page.createddate | divided_by:1000 | date_to_xmlschema}}",
+	"modified_at": "{{page.lastmodifieddt | divided_by:1000 | date_to_xmlschema}}",
+	"description": {{page.description | jsonify}},
+	"download_url": "{{page.clickableuri}}",
+	"html_url": "https://intel.com{{page.secondaryurl}}",
+	"url": "{{site.url}}/pcn/{{page.contentid}}",
+	"category": "{{page.emtcontenttype_en}}",
+	"self": "{{site.url}}{{page.url}}"
+}

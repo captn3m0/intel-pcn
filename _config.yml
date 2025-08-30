@@ -1,8 +1,8 @@
-title: Intel Product Change Notification Archive
+title: Intel Product Change Notifications
 
 description: >-
   An indexable repository of Intel Product Change Notifications,
-  so they can be searched on the internet.
+  so they can be searched and subscribed to.
 url: "https://intel.pcn.captnemo.in"
 
 theme: minima
@@ -12,7 +12,12 @@ plugins:
   - jekyll-datapage-generator
 baseurl: /
 exclude:
-  - README.md
+  - LICENSE
+  - netlify.toml
+  - pyproject.toml
+  - requirements.txt
+  - uv.lock
+  - old.db
   - .sass-cache/
   - .jekyll-cache/
   - .venv

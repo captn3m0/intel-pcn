@@ -5,24 +5,30 @@
   "title": "{{site.title}}",
   "home_page_url": "{{ site.url }}{{site.baseurl}}",
   "feed_url": "{{ site.url }}{{site.baseurl}}feed.json",
-  "description": "{{site.description}} All new PCNs are published on this feed daily.",
+  "language": "en",
+  "icon": "{{ site.url }}{{site.baseurl}}assets/android-chrome-512x512.png",
+  "favicon": "{{ site.url }}{{site.baseurl}}assets/assets/apple-touch-icon.png",
+  "user_comment": "Unofficial Feed for Intel Product Change Notifications, updated daily. Source on GitHub: https://github.com/captn3m0/intel-pcn",
+  "description": "Updated daily. Maintained by Nemo.",
   "items": [
-    {% assign D = site.data.pcn | sort:"createddate" | reverse %}
+    {% assign D = site.data.pcn | sort:"lastmodifieddt" | reverse %}
     {% for pcn in D limit:100 %}
     {
       "id": "PCN-{{pcn.contentid}}",
       "title": {{ pcn.systitle | jsonify }},
       "date_published": "{{ pcn.createddate | divided_by: 1000 | date_to_xmlschema }}",
+      "date_modified": "{{ pcn.lastmodifieddt | divided_by: 1000 | date_to_xmlschema }}",
       "url": "{{ site.url }}{{site.baseurl}}pcn/{{pcn.contentid}}/",
+      "tags": ["{{pcn.emtcontenttype_en}}"],
       "external_url": "https://intel.com{{pcn.secondaryurl}}",
+      "api_url": "{{ site.url }}{{site.baseurl}}api/{{pcn.contentid}}.json",
       "attachments": [
         {
           "url": {{ pcn.sysuri | jsonify }},
           "mime_type": "application/pdf",
           "title": "PCN-{{pcn.contentid}}.pdf"
         }
-      ],
-      "api_url": "{{ site.url }}{{site.baseurl}}/api/{{pcn.contentid}}.json"
+      ]
     }{% unless forloop.last %},{% endunless %}
     {% endfor %}
   ]
