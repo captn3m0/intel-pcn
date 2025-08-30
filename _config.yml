@@ -4,12 +4,12 @@ description: >-
   An indexable repository of Intel Product Change Notifications,
   so they can be searched and subscribed to.
 url: "https://intel.pcn.captnemo.in"
-
-theme: minima
 plugins:
   - jekyll_sqlite
   - jekyll-sitemap
+  - jekyll-feed
   - jekyll-datapage-generator
+  - jekyll-seo-tag
 baseurl: /
 exclude:
   - LICENSE

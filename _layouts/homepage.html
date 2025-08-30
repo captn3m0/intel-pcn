@@ -1,8 +1,23 @@
 ---
-layout: home
+layout: default
 ---
 
 {{content}}
+
+<style>
+  table {
+    border-collapse: collapse;
+    width: 90%;
+  }
+  td:nth-child(2) {
+	width: 70%;
+  }
+  td:nth-child(1) {
+	font-weight: 600;
+	font-family: monospace;
+  }
+
+</style>
 
 <table>
 	<thead>
@@ -16,12 +31,13 @@ layout: home
 		{% assign pcns = site.data.pcn | sort:"createddate" | reverse %}
 		{% for pcn in pcns %}
 		<tr>
-			<td><code>{{ pcn.contentid }}</code></td>
-			<td><a href="/pcn/{{ pcn.contentid }}/">{{ pcn.systitle | title}}</a></td>
+			<td>{{ pcn.contentid }}</td>
+			<td><a href="/pcn/{{ pcn.contentid }}/">{{ pcn.systitle | title | remove: "®" | remove: "Intel "}}</a></td>
 			<td data-order={{pcn.createddate}}>{{ pcn.createddate | divided_by:1000 | date_to_long_string }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
 </table>
 
-Created by [Nemo](https://captnemo.in).
+Created and maintained by <a href="https://captnemo.in">Nemo</a>. Source code 
+on <a href="https://github.com/captn3m0/intel-pcn">GitHub</a>. Hoted at Netlify.
