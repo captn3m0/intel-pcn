@@ -5,18 +5,43 @@ layout: default
 {{content}}
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 90%;
-  }
-  td:nth-child(2) {
-	width: 70%;
-  }
-  td:nth-child(1) {
-	font-weight: 600;
-	font-family: monospace;
-  }
+table {
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+}
 
+.pcn-id {
+  width: 50px;
+  min-width: 50px;
+  font-weight: 600;
+  font-family: monospace;
+  vertical-align: top;
+  padding-right: 1rem;
+}
+
+td:last-child {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  table {
+    font-size: 14px;
+  }
+  
+  .pcn-id {
+    width: 70px;
+    min-width: 70px;
+    font-size: 12px;
+    padding-right: 0.5rem;
+  }
+}
+body{
+	max-width: 80em;
+}
 </style>
 
 <table>
@@ -24,20 +49,19 @@ layout: default
 		<tr>
 			<th>PCN</th>
 			<th>Title</th>
-			<th>Date</th>
 		</tr>
 	</thead>
 	<tbody>
 		{% assign pcns = site.data.pcn | sort:"createddate" | reverse %}
 		{% for pcn in pcns %}
 		<tr>
-			<td>{{ pcn.contentid }}</td>
-			<td><a href="/pcn/{{ pcn.contentid }}/">{{ pcn.systitle | title | remove: "®" | remove: "Intel "}}</a></td>
-			<td data-order={{pcn.createddate}}>{{ pcn.createddate | divided_by:1000 | date_to_long_string }}</td>
+			{% assign T=pcn.systitle | title | remove: "®" | remove: "Intel "|remove:"(R)"|remove:"¬" %}
+			<td><span class=pcn-id>{{ pcn.contentid }}</span><br><time datetime="{{ pcn.createddate | divided_by:1000 | date:'%Y-%M-%d'}}">{{ pcn.createddate | divided_by:1000 | date:"%d %b %y" }}</time></td>
+			<td><a href="/pcn/{{ pcn.contentid }}/" alt="{{T}}" title="{{T}}">{{T}}</a></td>
 		</tr>
 		{% endfor %}
 	</tbody>
 </table>
 
 Created and maintained by <a href="https://captnemo.in">Nemo</a>. Source code 
-on <a href="https://github.com/captn3m0/intel-pcn">GitHub</a>. Hoted at Netlify.
+on <a href="https://github.com/captn3m0/intel-pcn">GitHub</a>. Hosted at Netlify.

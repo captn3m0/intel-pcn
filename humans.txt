@@ -1,0 +1,14 @@
+/* TEAM */
+	Writer: Nemo
+	Contact: intel.pcn@captnemo.in
+	Twitter: @captn3m0
+	Fediverse: @nemo@tatooine.club
+	From: Bangalore, India
+
+/* SITE */
+	Last update: {{ site.time | date: '%A, %B %e, %Y' }}
+	Language: English
+	Doctype: HTML5
+	IDE: Sublime Text
+	Tools: Jekyll, Python
+	Host: Netlify
