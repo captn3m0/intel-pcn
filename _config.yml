@@ -38,6 +38,12 @@ sqlite:
 - file: pcn.db
   query: SELECT * FROM pcns
   data: pcn
+- file: pcn.db
+  query: SELECT COUNT(*) as size, emtcontenttype_en as category FROM pcns GROUP BY category
+  data: counts
+- file: pcn.db
+  query: SELECT MAX(createddate)/1000 as created_at from pcns
+  data: maxdate
 page_gen:
 
 - data: pcn

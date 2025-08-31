@@ -1,0 +1,10 @@
+---
+permalink: /metrics
+---
+{%- for COUNTER in site.data.counts -%}
+pcn_count{category="{{COUNTER.category}}"} {{COUNTER.size}}
+{% endfor %}
+most_recent_pcn_date {{site.data.maxdate.first.created_at}}
+jekyll_version {{jekyll.version | replace: ".", "0"}}
+jekyll_environment {{jekyll.environment}}
+build_timestamp {{site.time |  date:"%s"}}
