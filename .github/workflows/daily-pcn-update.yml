@@ -34,21 +34,20 @@ jobs:
         echo "Database size: $(stat -f%z pcn.db 2>/dev/null || stat -c%s pcn.db) bytes"
         echo $(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns") ROWS
         
-        old_fingerprint=$(sqlite3 old.db "SELECT MAX(createddate)/1000, COUNT(*) FROM pcns")
-        new_fingerprint=$(sqlite3 pcn.db "SELECT MAX(createddate)/1000, COUNT(*) FROM pcns")
+        old_count=$(sqlite3 old.db "SELECT COUNT(*) FROM pcns")
+        new_count=$(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns")
         
-        echo "Old database fingerprint: $old_fingerprint"
-        echo "New database fingerprint: $new_fingerprint"
+        echo "Old database count: $old_count"
+        echo "New database count: $new_count"
         
-        pcn_count=$(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns")
-        echo "count=$pcn_count" >> $GITHUB_OUTPUT
+        echo "count=$new_count" >> $GITHUB_OUTPUT
         
-        if [ "$old_fingerprint" == "$new_fingerprint" ]; then
-          echo "changed=false" >> $GITHUB_OUTPUT
-          echo "Database fingerprints match - skipping release"
-        else
+        if [ "$new_count" -gt "$old_count" ]; then
           echo "changed=true" >> $GITHUB_OUTPUT
-          echo "Database fingerprints differ - proceeding with release"
+          echo "PCN count increased - proceeding with release"
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "PCN count not higher - skipping release"
         fi
         
     - name: Create release
