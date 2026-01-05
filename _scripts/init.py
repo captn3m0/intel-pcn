@@ -194,8 +194,8 @@ def main():
         for year in range(START_YEAR, current_year+1):
             pcns = fetch_pcns(auth_token, str(year))
             
-            if not pcns:
-                print("No PCNs fetched. Exiting.")
+            if not pcns and year!=current_year:
+                print(f"No PCNs fetched for {year}. Exiting.")
                 import sys
                 sys.exit(1)
                 return
