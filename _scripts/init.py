@@ -1,28 +1,23 @@
 #!/usr/bin/env python3
 """
-Intel PCN fetcher and database initializer.
-Fetches PCNs from Intel's search API and stores them in SQLite database.
+Intel PCN fetcher and database updater.
+Fetches PCNs from Intel's search API for the last 7 days and updates the SQLite database.
 """
 
 import sqlite3
 import requests
 import json
-import os
-import curl_cffi
 import datetime
+import curl_cffi
 from pathlib import Path
 from typing import Dict, Any, List
 
 
-# https://www.intel.com/content/www/us/en/content-details/677724/max-5000-product-change-notification.html
-# Oldest PCN from Intel that is available on the current site
-START_YEAR = 1994
-def create_database() -> sqlite3.Connection:
-    """Create and initialize the PCN database."""
+def open_database() -> sqlite3.Connection:
+    """Open (or create) the PCN database."""
     db_path = Path("pcn.db")
     conn = sqlite3.connect(db_path)
-    
-    # Create the PCN table with all the fields from the sample
+
     conn.execute("""
         CREATE TABLE IF NOT EXISTS pcns (
             contentid INTEGER PRIMARY KEY,
@@ -54,7 +49,7 @@ def create_database() -> sqlite3.Connection:
             issoftware TEXT
         )
     """)
-    
+
     conn.commit()
     return conn
 
@@ -68,9 +63,8 @@ def normalize_value(value: Any) -> str:
 
 def insert_pcn(conn: sqlite3.Connection, raw_pcn: Dict[str, Any]) -> None:
     """Insert a PCN record into the database."""
-    # Normalize all values
     normalized = {key: normalize_value(value) for key, value in raw_pcn.items()}
-    
+
     conn.execute("""
         INSERT OR REPLACE INTO pcns (
             systitle, sysurihash, createddate, urihash, binaryfilesize,
@@ -113,27 +107,24 @@ def insert_pcn(conn: sqlite3.Connection, raw_pcn: Dict[str, Any]) -> None:
     ))
 
 
-def fetch_pcns(token: str, year: str) -> List[Dict[str, Any]]:
-    """Fetch all PCNs from Intel's API using pagination."""
+def fetch_pcns(token: str, start_date: str) -> List[Dict[str, Any]]:
+    """Fetch all PCNs from Intel's API since start_date using pagination."""
     url = "https://intelcorporationproductione78n25s6.org.coveo.com/rest/search"
-    
+
     headers = {
         "accept-encoding": "gzip, deflate, br, zstd",
         "accept": "application/json",
         "content-type": "application/json",
         "authorization": f"Bearer {token}",
     }
-    
+
     all_pcns = []
     first_result = 0
     results_per_page = 100
 
-    startdate = f"{year}/01/01"
-    enddate   = f"{year}/12/31"
-    
     while True:
         payload = {
-            "aq": f"(@localecode==en_US) (@synapticaguid==(\"etm-b6e7ce4fd9e144048c526ca9c64587d8\",\"etm-fb506128738d478fbd7c7c7992367c48\",\"etm-432664f7da684e6fb3347b2fc528a3c7\",\"etm-53e34c9049b54c69aec7931e09591a7d\")) (@lastmodifieddt>={startdate} AND @lastmodifieddt<={enddate})",
+            "aq": f"(@localecode==en_US) (@synapticaguid==(\"etm-b6e7ce4fd9e144048c526ca9c64587d8\",\"etm-fb506128738d478fbd7c7c7992367c48\",\"etm-432664f7da684e6fb3347b2fc528a3c7\",\"etm-53e34c9049b54c69aec7931e09591a7d\")) (@lastmodifieddt>={start_date})",
             "firstResult": first_result,
             "numberOfResults": results_per_page,
             "locale": "en",
@@ -144,77 +135,69 @@ def fetch_pcns(token: str, year: str) -> List[Dict[str, Any]]:
             "searchHub": "rdc-technicallibrary",
             "queryFunctions": []
         }
-        
+
         try:
             response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()
-            
+
             data = response.json()
             results = data.get("results", [])
-            
+
             if not results:
                 break
-            
-            # Extract raw PCN data
+
             for result in results:
                 if "raw" in result:
                     all_pcns.append(result["raw"])
-            
-            # Check if we got fewer results than requested (indicates end of data)
+
             if len(results) < results_per_page:
                 break
-            
+
             first_result += results_per_page
-            
+
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data: {e}")
             break
         except json.JSONDecodeError as e:
             print(f"Error parsing JSON response: {e}")
             break
-    
+
     return all_pcns
 
-def get_token()-> str: 
+def get_token() -> str:
     BROWSER_CODE = "safari18_4_ios"
     TOKEN_URL = "https://www.intel.com/libs/intel/services/replatform?searchHub=rdc-technicallibrary"
     body = curl_cffi.get(TOKEN_URL, impersonate=BROWSER_CODE).json()
     return body['token']
 
 def main():
-    """Main function to fetch PCNs and populate database."""
-    print("Initializing Intel PCN database...")
-    
-    # Create database and connection
-    conn = create_database()
+    """Main function to fetch recent PCNs and update database."""
+    print("Updating Intel PCN database...")
+
+    conn = open_database()
     auth_token = get_token()
-    
+
+    start_date = (datetime.date.today() - datetime.timedelta(days=30)).strftime("%Y/%m/%d")
+    print(f"Fetching PCNs since {start_date}...")
+
     try:
-        current_year = datetime.datetime.now().year
-        for year in range(START_YEAR, current_year+1):
-            pcns = fetch_pcns(auth_token, str(year))
-            
-            if not pcns and year!=current_year:
-                print(f"No PCNs fetched for {year}. Exiting.")
-                import sys
-                sys.exit(1)
-                return
-            
-            print(f"YEAR={year} | {len(pcns)} PCNs")
-            for i, pcn in enumerate(pcns, 1):
-                insert_pcn(conn, pcn)
-                if i % 50 == 0:
-                    conn.commit()
-        
-        # Final commit
-        conn.commit()
-        
-        # Show summary
         cursor = conn.execute("SELECT COUNT(*) FROM pcns")
-        count = cursor.fetchone()[0]
-        print(f"Successfully inserted {count} PCNs into pcn.db")
-        
-    
+        count_before = cursor.fetchone()[0]
+
+        pcns = fetch_pcns(auth_token, start_date)
+        print(f"Fetched {len(pcns)} PCNs from the last 30 days")
+
+        for i, pcn in enumerate(pcns, 1):
+            insert_pcn(conn, pcn)
+            if i % 50 == 0:
+                conn.commit()
+
+        conn.commit()
+
+        cursor = conn.execute("SELECT COUNT(*) FROM pcns")
+        count_after = cursor.fetchone()[0]
+        print(f"Database updated: {count_before} → {count_after} PCNs ({count_after - count_before} new)")
+
     finally:
         conn.close()
 

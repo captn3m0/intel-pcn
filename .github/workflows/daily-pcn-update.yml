@@ -8,23 +8,29 @@ on:
 jobs:
   update-pcn-database:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
-      
+
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-python@v6
-    
 
     - name: Get current date
       id: date
       run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
-    - name: Download last latest release pcn.db as old.db
-      run: wget "${{github.server_url}}/${{github.repository}}/releases/latest/download/pcn.db" -O old.db
-    - name: Build Database
+
+    - name: Download latest release pcn.db
+      run: wget "${{github.server_url}}/${{github.repository}}/releases/latest/download/pcn.db" -O pcn.db
+
+    - name: Record old PCN count
+      id: old_count
+      run: echo "count=$(sqlite3 pcn.db 'SELECT COUNT(*) FROM pcns')" >> $GITHUB_OUTPUT
+
+    - name: Update Database
       run: pip install -r requirements.txt && python _scripts/init.py
-    - name: Check database and compare fingerprints
+
+    - name: Check database and compare counts
       id: compare
       run: |
         if [ ! -f pcn.db ]; then
@@ -32,16 +38,15 @@ jobs:
           exit 1
         fi
         echo "Database size: $(stat -f%z pcn.db 2>/dev/null || stat -c%s pcn.db) bytes"
-        echo $(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns") ROWS
-        
-        old_count=$(sqlite3 old.db "SELECT COUNT(*) FROM pcns")
+
+        old_count=${{ steps.old_count.outputs.count }}
         new_count=$(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns")
-        
+
         echo "Old database count: $old_count"
         echo "New database count: $new_count"
-        
+
         echo "count=$new_count" >> $GITHUB_OUTPUT
-        
+
         if [ "$new_count" -gt "$old_count" ]; then
           echo "changed=true" >> $GITHUB_OUTPUT
           echo "PCN count increased - proceeding with release"
@@ -49,7 +54,7 @@ jobs:
           echo "changed=false" >> $GITHUB_OUTPUT
           echo "PCN count not higher - skipping release"
         fi
-        
+
     - name: Create release
       uses: softprops/action-gh-release@v2
       id: create_release
@@ -59,14 +64,14 @@ jobs:
         name: PCN Database - ${{ steps.date.outputs.date }}
         body: |
           Daily Intel PCN database update for ${{ steps.date.outputs.date }}
-          
+
           This release contains the latest Intel PCN Data
-          
+
           **Database Stats:**
           - Generated: ${{ steps.date.outputs.date }}
           - File: `pcn.db` (SQLite database)
           - PCN Count: ${{ steps.compare.outputs.count }}
-          
+
           **Usage:**
           - Download `pcn.db` to query PCN data locally
           - Website: [Intel PCN Database](https://intel.pcn.captnemo.in/)
@@ -76,7 +81,7 @@ jobs:
         make_latest: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+
     - name: Trigger Netlify build
       if: steps.compare.outputs.changed == 'true' && steps.create_release.conclusion == 'success'
       run: |
