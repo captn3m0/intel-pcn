@@ -6,18 +6,20 @@ updates:
       interval: weekly
       time: "04:00"
       timezone: Asia/Calcutta
+    cooldown:
+      default-days: 7
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       time: "04:00"
       interval: weekly
       timezone: Asia/Calcutta
+    cooldown:
+      default-days: 7
   - package-ecosystem: "bundler"
     vendor: true
     directory: "/"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "gitsubmodule"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+    cooldown:
+      default-days: 7
