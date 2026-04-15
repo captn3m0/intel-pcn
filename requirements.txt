@@ -11,7 +11,7 @@ charset-normalizer==3.4.6
     # via
     #   intel-pcn (pyproject.toml)
     #   requests
-curl-cffi==0.14.0
+curl-cffi==0.15.0
     # via intel-pcn (pyproject.toml)
 idna==3.11
     # via
