@@ -7,6 +7,7 @@
 	"modified_at": "{{page.lastmodifieddt | divided_by:1000 | date_to_xmlschema}}",
 	"description": {{page.description | jsonify}},
 	"download_url": "{{page.clickableuri}}",
+	"original_url": "{{page.uri}}",
 	"html_url": "https://intel.com{{page.secondaryurl}}",
 	"url": "{{site.url}}/pcn/{{page.contentid}}",
 	"category": "{{page.emtcontenttype_en}}",

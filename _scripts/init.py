@@ -12,6 +12,10 @@ import curl_cffi
 from pathlib import Path
 from typing import Dict, Any, List
 
+from pdf import resolve_uri
+
+session = requests.Session()
+
 
 def open_database() -> sqlite3.Connection:
     """Open (or create) the PCN database."""
@@ -64,6 +68,7 @@ def normalize_value(value: Any) -> str:
 def insert_pcn(conn: sqlite3.Connection, raw_pcn: Dict[str, Any]) -> None:
     """Insert a PCN record into the database."""
     normalized = {key: normalize_value(value) for key, value in raw_pcn.items()}
+    normalized["clickableuri"] = resolve_uri(normalized.get("uri", ""), session)
 
     conn.execute("""
         INSERT OR REPLACE INTO pcns (

@@ -22,9 +22,10 @@
       "tags": ["{{pcn.emtcontenttype_en}}"],
       "external_url": "https://intel.com{{pcn.secondaryurl}}",
       "api_url": "{{ site.url }}{{site.baseurl}}api/{{pcn.contentid}}.json",
+      "_original_url": {{ pcn.uri | jsonify }},
       "attachments": [
         {
-          "url": {{ pcn.sysuri | jsonify }},
+          "url": {{ pcn.clickableuri | jsonify }},
           "mime_type": "application/pdf",
           "title": "PCN-{{pcn.contentid}}.pdf"
         }

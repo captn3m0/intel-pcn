@@ -15,7 +15,8 @@ Note: The API does not have any rate-limits or restrictions.
 	"created_at": "ISO-8601 datetime",
 	"modified_at": "ISO-8601 datetime",
 	"description": "string",
-	"download_url": "string, PDF URL to upstream",
+	"download_url": "string, direct PDF URL (typically docs.altera.com after Intel's 2025 Altera divestiture; falls back to original_url for documents not yet resolved or gated behind a loginwall)",
+	"original_url": "string, the original cdrdv2.intel.com URL as published by Intel",
 	"html_url": "string, link to intel.com HTML PCN page",
 	"url": "string, link to simpler html pcn page hosted here",
 	"category": "string, Content type",
@@ -30,11 +31,12 @@ Feed includes latest 100 PCNs. Each PCN includes the following fields:
 
 1. `url` : PCN HTML page hosted here
 2. `external_url`: PCN HTML page hosted at intel.com
-3. `attachment`: PDF URL, hosted at intel.com
-4. `api_url`: API URL for the PCN details, as above
-5. `id`: PCN ID
-5. `title`: PCN Title
-6. `date_published` / `date_modified`
+3. `attachments[].url`: direct PDF URL (resolved — typically on docs.altera.com)
+4. `_original_url`: the original cdrdv2.intel.com URL as published by Intel
+5. `api_url`: API URL for the PCN details, as above
+6. `id`: PCN ID
+7. `title`: PCN Title
+8. `date_published` / `date_modified`
 
 ## `/feed.xml`
 

@@ -24,9 +24,16 @@ sitemap: true
 			<td>{{page.description}}</td>
 		</tr>
 		<tr>
-			<th>Upstream PDF</th>
-			<td><a href="{{page.sysuri}}">PCN-{{page.contentid}}.pdf</a></td>
+			<th>Download PDF</th>
+			<td><a href="{{page.clickableuri}}">PCN-{{page.contentid}}.pdf</a></td>
 		</tr>
+
+		{% if page.uri != page.clickableuri %}
+		<tr>
+			<th>Original URL</th>
+			<td><a href="{{page.uri}}">{{page.uri}}</a></td>
+		</tr>
+		{% endif %}
 
 		<tr>
 			<th>Intel Website URL</th>

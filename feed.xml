@@ -24,9 +24,10 @@
 					<br>
 					{{pcn.abstract}}
 					<br>
-					Complete PCN PDF is available at <a href="{{ pcn.sysuri}}">{{ pcn.sysuri}}</a>.
+					Complete PCN PDF is available at <a href="{{ pcn.clickableuri }}">{{ pcn.clickableuri }}</a>.
 					<strong>Description: </strong>{{pcn.description}}<br>
 					<strong>Type: </strong>{{pcn.downloadtype}}<br>
+					<strong>Original URL: </strong><a href="{{ pcn.uri }}">{{ pcn.uri }}</a><br>
 					<strong>Intel HTML: </strong><a href="https://www.intel.com{{pcn.secondaryurl}}">Intel Website</a><br>
 
 
