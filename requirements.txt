@@ -21,7 +21,7 @@ pycparser==3.0
     # via cffi
 requests==2.33.1
     # via intel-pcn (pyproject.toml)
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   intel-pcn (pyproject.toml)
     #   requests
