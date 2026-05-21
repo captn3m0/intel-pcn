@@ -19,7 +19,7 @@ idna==3.15
     #   requests
 pycparser==3.0
     # via cffi
-requests==2.33.1
+requests==2.34.1
     # via intel-pcn (pyproject.toml)
 urllib3==2.7.0
     # via
