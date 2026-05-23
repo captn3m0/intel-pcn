@@ -1,7 +1,7 @@
 [project]
 name = "intel-pcn"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "Intel PCN Website Generator"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
