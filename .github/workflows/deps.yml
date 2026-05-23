@@ -10,7 +10,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
         id: metadata
@@ -22,6 +22,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           submodules: true
+          persist-credentials: false
       - name: Enable auto-merge for Dependabot PRs for release data
         run: gh pr merge --auto --rebase "$PR_URL"
         env:

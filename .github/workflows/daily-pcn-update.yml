@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
 
     - name: Get current date
@@ -39,7 +41,7 @@ jobs:
         fi
         echo "Database size: $(stat -f%z pcn.db 2>/dev/null || stat -c%s pcn.db) bytes"
 
-        old_count=${{ steps.old_count.outputs.count }}
+        old_count=${STEPS_OLD_COUNT_OUTPUTS_COUNT}
         new_count=$(sqlite3 pcn.db "SELECT COUNT(*) FROM pcns")
 
         echo "Old database count: $old_count"
@@ -54,33 +56,36 @@ jobs:
           echo "changed=false" >> $GITHUB_OUTPUT
           echo "PCN count not higher - skipping release"
         fi
+      env:
+        STEPS_OLD_COUNT_OUTPUTS_COUNT: ${{ steps.old_count.outputs.count }}
 
     - name: Create release
-      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       id: create_release
       if: steps.compare.outputs.changed == 'true'
-      with:
-        tag_name: ${{ steps.date.outputs.date }}
-        name: PCN Database - ${{ steps.date.outputs.date }}
-        body: |
-          Daily Intel PCN database update for ${{ steps.date.outputs.date }}
-
-          This release contains the latest Intel PCN Data
-
-          **Database Stats:**
-          - Generated: ${{ steps.date.outputs.date }}
-          - File: `pcn.db` (SQLite database)
-          - PCN Count: ${{ steps.compare.outputs.count }}
-
-          **Usage:**
-          - Download `pcn.db` to query PCN data locally
-          - Website: [Intel PCN Database](https://intel.pcn.captnemo.in/)
-        files: |
-          pcn.db
-        generate_release_notes: false
-        make_latest: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_TAG: ${{ steps.date.outputs.date }}
+        RELEASE_COUNT: ${{ steps.compare.outputs.count }}
+      run: |
+        notes=$(cat <<EOF
+        Daily Intel PCN database update for ${RELEASE_TAG}
+
+        This release contains the latest Intel PCN Data
+
+        **Database Stats:**
+        - Generated: ${RELEASE_TAG}
+        - File: \`pcn.db\` (SQLite database)
+        - PCN Count: ${RELEASE_COUNT}
+
+        **Usage:**
+        - Download \`pcn.db\` to query PCN data locally
+        - Website: [Intel PCN Database](https://intel.pcn.captnemo.in/)
+        EOF
+        )
+        gh release create "$RELEASE_TAG" pcn.db \
+          --title "PCN Database - $RELEASE_TAG" \
+          --notes "$notes" \
+          --latest
 
     - name: Trigger Netlify build
       if: steps.compare.outputs.changed == 'true' && steps.create_release.conclusion == 'success'
