@@ -170,7 +170,7 @@ def fetch_pcns(token: str, start_date: str) -> List[Dict[str, Any]]:
     return all_pcns
 
 def get_token() -> str:
-    BROWSER_CODE = "safari18_4_ios"
+    BROWSER_CODE = "safari2601"
     TOKEN_URL = "https://www.intel.com/libs/intel/services/replatform?searchHub=rdc-technicallibrary"
     body = curl_cffi.get(TOKEN_URL, impersonate=BROWSER_CODE).json()
     return body['token']
