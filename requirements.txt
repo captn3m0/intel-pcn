@@ -17,7 +17,7 @@ idna==3.20
     # via
     #   intel-pcn (pyproject.toml)
     #   requests
-pycparser==3.0
+pycparser==3.11
     # via cffi
 requests==2.34.2
     # via intel-pcn (pyproject.toml)
